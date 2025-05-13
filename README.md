@@ -1,6 +1,6 @@
 # ✅ TestDevBootcamp Composability Contract — README
 
-## 🕉 Overview
+##  Overview
 
 **TestDevBootcamp** is a composability smart contract demonstrating **cross-chain interactions** between Ethereum and Solana via Neon EVM using a wrapped SPL token (`ERC20ForSPLMintable`). It enables Ethereum-native token operations to reflect actions on Solana using Solana's token program and associated token accounts (ATAs).
 
