@@ -58,6 +58,14 @@ This executes a Solana CPI transfer and then mints ERC-20 tokens on the EVM side
 
 ---
 
+
+
+```solidity
+function getUserATA(address user) external
+```
+
+This returns the ATA given to an EVM address
+
 ## 🧪 Why Composability Matters
 
 This contract is a **real-world demonstration** of cross-chain composability:
