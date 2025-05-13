@@ -97,15 +97,52 @@ async function main() {
     await tx3.wait(1);
     console.log(tx3.hash, "erc20forspl approve");
 
+    const new_amount = 2 * 10 ** 9
     const tx4 = await TestDevBootcamp.transfer(
         amount,
-        config.utils.publicKeyToBytes32(randomSolanaAccount.publicKey.toBase58())
-    );
+       // config.utils.publicKeyToBytes32(randomSolanaAccount.publicKey.toBase58()),
+        // FbcyK62bgPP78nLfeVkjVN12hZrYMgk6duwCgPWjMcD6
+        "0x" + Buffer.from(bs58.decode(randomSolanaAccount.publicKey.toBase58())).toString("hex")
+);
+        //    config.utils.publicKeyToBytes32(randomSolanaAccount.publicKey.toBase58())
+        
+
     await tx4.wait(1);
     console.log(tx4.hash, "TestDevBootcamp transfer");
+
+    
+    // const signature2 = await web3.sendAndConfirmTransaction(
+    //     connection,
+    //     solanaTx,
+    //     [keypair]
+    // );
+    // console.log(signature2, "another transaction");
+
+
+    // const tx5 = await TestDevBootcamp.transferFromSolana(
+    //    // config.utils.publicKeyToBytes32(randomSolanaAccount.publicKey.toBase58()),
+    // //    FbcyK62bgPP78nLfeVkjVN12hZrYMgk6duwCgPWjMcD6,
+    // "0x" + Buffer.from(bs58.decode(randomSolanaAccount.publicKey.toBase58())).toString("hex"),
+    //     user1.address,
+    //     new_amount
+    // );
+
+    // await tx5.wait(1);
+
+    // console.log(tx5.hash,"Transfer from solana account to eV")
+
+
+    const ata = await TestDevBootcamp.getUserATA(user1.address);
+    console.log("ATA from contract:", ata);
+    
+
+    
+
+    
 }
 
 main().catch((error) => {
     console.error(error);
     process.exitCode = 1;
 });
+

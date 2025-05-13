@@ -21,6 +21,14 @@ contract TestDevBootcamp {
         return CALL_SOLANA.getNeonAddress(evm_address);
     }
 
+
+    /**
+     * @notice Transfers tokens from the contract’s EVM balance to a Solana recipient
+     * @dev Moves tokens from sender to contract, then to its ATA, and finally to a Solana account via a CPI call
+     * @param amount The number of tokens to transfer
+     * @param receiver The recipient's Solana address in bytes32 format
+     */
+
     function transfer(uint64 amount, bytes32 receiver) external {
         require(amount > 0, 'ERROR: INVALID AMOUNT');
 
@@ -71,6 +79,88 @@ contract TestDevBootcamp {
         // Execute the transfer instruction
         CALL_SOLANA.execute(0, transferInstruction);
     }
+
+
+// Creating the new composability request aside from the one from the Tutorial 
+
+// This request allows one to transfer from a solana account to 
+
+    /**
+     * @notice Transfers tokens from a Solana account to an EVM address via the contract
+     * @dev Executes a Solana instruction to transfer tokens from a Solana account to the contract's ATA,
+     *      then reflects the transfer on the EVM side to the given recipient.
+     * @param solanaSender The Solana address (in bytes32) sending the tokens
+     * @param evmRecipient The EVM address receiving the tokens
+     * @param amount The amount of tokens to transfer
+     */
+
+
+function transferFromSolana(
+    bytes32 solanaSender,
+    address evmRecipient,
+    uint64 amount
+) external {
+    require(amount > 0, "ERROR: INVALID AMOUNT");
+
+    bytes32 tokenMint = IERC20ForSPL(token).tokenMint();
+    // bytes32 evmRecipientATA = getAssociateTokenAccount(
+    //     CALL_SOLANA.getNeonAddress(evmRecipient),
+    //     TOKEN_PROGRAM,
+    //     tokenMint
+    // );
+
+    bytes32 contractATA = getAssociateTokenAccount(
+        CALL_SOLANA.getNeonAddress(address(this)),
+        TOKEN_PROGRAM,
+        tokenMint
+    );
+
+    (
+        bytes32[] memory accounts,
+        bool[] memory isSigner,
+        bool[] memory isWritable,
+        bytes memory data
+    ) = _formatTransferInstruction(
+        solanaSender,
+        contractATA,
+        solanaSender,
+        amount
+    );
+
+    // Build and execute Solana instruction
+    bytes memory instruction = CallSolanaHelperLib.prepareSolanaInstruction(
+        TOKEN_PROGRAM,
+        accounts,
+        isSigner,
+        isWritable,
+        data
+    );
+
+    CALL_SOLANA.execute(0, instruction);
+
+    // Now reflect this on the EVM side
+    IERC20ForSPL(token).transfer(evmRecipient, amount);
+}
+
+
+/// @notice Returns the Solana Associated Token Account (ATA) for a given EVM address
+/// @param user The EVM address of the user
+/// @return The corresponding Solana ATA
+function getUserATA(address user) external view returns (bytes32) {
+    bytes32 neonAddress = CALL_SOLANA.getNeonAddress(user);
+    bytes32 tokenMint = IERC20ForSPL(token).tokenMint();
+    return getAssociateTokenAccount(neonAddress, TOKEN_PROGRAM, tokenMint);
+}
+
+    /**
+     * @notice Computes the Solana PDA for an Associated Token Account (ATA)
+     * @dev Uses CALL_SOLANA to compute a PDA for a token account owned by `owner`
+     * @param owner The Solana address (bytes32) of the account owner
+     * @param programId The Token Program ID (bytes32)
+     * @param mint The token mint address (bytes32)
+     * @return The computed PDA for the associated token account
+     */
+
 
     function getAssociateTokenAccount(bytes32 owner, bytes32 programId, bytes32 mint) public view returns(bytes32) {
         return CALL_SOLANA.getSolanaPDA(
