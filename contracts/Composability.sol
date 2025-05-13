@@ -94,6 +94,7 @@ contract TestDevBootcamp {
      * @param amount The amount of tokens to transfer
      */
 
+// the first controlability function I added 
 
 function transferFromSolana(
     bytes32 solanaSender,
@@ -142,6 +143,7 @@ function transferFromSolana(
     IERC20ForSPL(token).transfer(evmRecipient, amount);
 }
 
+// The second composability function I add 
 
 /// @notice Returns the Solana Associated Token Account (ATA) for a given EVM address
 /// @param user The EVM address of the user
